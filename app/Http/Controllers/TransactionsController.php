@@ -6,16 +6,59 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Info(
+ *     title="Transaction ",
+ *     version="1.0.0",
+ *     description="API for managing transactions"
+ * )
+ */
+
 class TransactionsController extends Controller
 {
-   
+     /**
+     * @OA\Get(
+     *     path="/v1/transactions",
+     *     summary="Get a list of transactions",
+     *     tags={"Transactions"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="A list of transactions",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Transaction")
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
-        $transactions = Transaction::all();
+        $userId = Auth::id();
+        $transactions = Transaction::where('user_id', $userId)->get();
         return response()->json($transactions);
     }
 
- 
+      /**
+     * @OA\Post(
+     *     path="/v1/transactions",
+     *     summary="Create a new transaction",
+     *     tags={"Transactions"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Transaction")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Transaction created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Transaction")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input"
+     *     )
+     * )
+     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -35,18 +78,80 @@ class TransactionsController extends Controller
         return response()->json($transaction, 201);
     }
 
+        /**
+     * @OA\Get(
+     *     path="/v1/transactions/{id}",
+     *     summary="Get a specific transaction by ID",
+     *     tags={"Transactions"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the transaction",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Details of the specified transaction",
+     *         @OA\JsonContent(ref="#/components/schemas/Transaction")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Transaction not found"
+     *     )
+     * )
+     */
+
  
-    public function show($id)
-    {
-        $transaction = Transaction::find($id);
+     public function show($id)
+     {
+         $userId = Auth::id();
+         $transaction = Transaction::where('id', $id)->where('user_id', $userId)->first();
+     
+         if (!$transaction) {
+             return response()->json(['message' => 'Transaction not found'], 404);
+         }
+     
+         return response()->json($transaction);
+     }
+ 
     
-        if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
-        }
-    
-        return response()->json($transaction);
-    }
-    
+        /**
+     * @OA\Put(
+     *     path="/v1/transactions/{id}",
+     *     summary="Update an existing transaction",
+     *     tags={"Transactions"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the transaction",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/Transaction")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Transaction updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Transaction")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Transaction not found"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized to update this transaction"
+     *     )
+     * )
+     */
+
     public function update(Request $request, $id)
     {
 
@@ -80,7 +185,32 @@ class TransactionsController extends Controller
     
     
     
-
+       /**
+     * @OA\Delete(
+     *     path="/v1/transactions/{id}",
+     *     summary="Delete a specific transaction",
+     *     tags={"Transactions"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the transaction",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Transaction deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Transaction not found"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized to delete this transaction"
+     *     )
+     * )
+     */
 
    
     public function destroy($id)

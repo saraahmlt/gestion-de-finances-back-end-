@@ -14,4 +14,8 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::post('/login', [UsersController::class, 'login'])->name('users.login');
     Route::post('/register', [UsersController::class, 'register'])->name('users.register');
+
+    Route::get('/api/documentation', function () {
+        return view('swagger-ui');
+    });
 });
