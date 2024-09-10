@@ -19,3 +19,4 @@ Route::group(['prefix' => 'v1'], function () {
         return view('swagger-ui');
     });
 });
+
