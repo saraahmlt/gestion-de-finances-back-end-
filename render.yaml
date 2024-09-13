@@ -1,7 +1,8 @@
 runtime: php
 phpVersion: "8.2"
 buildCommand:
-  - composer install
+  - curl -sS https://getcomposer.org/installer | php
+  - php composer.phar install
   - php artisan key:generate
   - php artisan config:cache
 startCommand: php artisan serve --host 0.0.0.0 --port $PORT
