@@ -24,12 +24,12 @@ class Kernel extends HttpKernel
         'web' => [
             // Middleware web
         ],
-
         'api' => [
-            \App\Http\Middleware\Cors::class, // Ajout du middleware CORS ici
+            \Fruitcake\Cors\HandleCors::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+    
     ];
 
     /**
