@@ -25,6 +25,7 @@ class Cors
         if (in_array($origin, $allowedOrigins)) {
             $response = $next($request);
 
+
             if ($request->getMethod() === 'OPTIONS') {
                 return response()->json('OK', 200, [
                     'Access-Control-Allow-Origin' => $origin,
@@ -44,5 +45,6 @@ class Cors
         return $next($request);
     }
 }
+
 
 
