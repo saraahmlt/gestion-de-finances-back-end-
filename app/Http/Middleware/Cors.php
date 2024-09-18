@@ -16,19 +16,23 @@ class Cors
      */
     public function handle(Request $request, Closure $next)
     {
-        $response = $next($request);
+        $allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3004'
+        ];
 
-        // Set CORS headers
-        $response->headers->set('Access-Control-Allow-Origin', '*'); // Autorise tout domaine, vous pouvez spécifier les domaines.
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        $response->headers->set('Access-Control-Allow-Credentials', 'true');
-
-        // Handle preflight requests (OPTIONS)
-        if ($request->getMethod() == 'OPTIONS') {
-            $response->setStatusCode(200);
+        if (in_array($request->headers->get('Origin'), $allowedOrigins)) {
+            $origin = $request->headers->get('Origin');
+        } else {
+            $origin = '';
         }
 
-        return $response;
+        $response = $next($request);
+        return $response
+            ->header('Access-Control-Allow-Origin', $origin)
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            ->header('Access-Control-Allow-Credentials', 'true');
     }
 }
+
